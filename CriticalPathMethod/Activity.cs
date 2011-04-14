@@ -69,21 +69,6 @@ namespace CriticalPathMethod
         /// </summary>
         public ICollection<Activity> Successors { get; private set; }
 
-        /// <summary>
-        /// Returns the index of a given activity.
-        /// </summary>
-        /// <param name="aux">Activity serving as an auxiliary referencing an existing
-        /// activity.</param>
-        /// <param name="i">Current activities' array index.</param>
-        /// <returns>index</returns>
-        public static int GetIndex(Activity[] list, Activity aux, int i)
-        {
-            for (int j = 1; j < i; j++) {
-                if (list[j].Id == aux.Id)
-                    return j;
-            }
-            return 0;
-        }
     }
 }
 
