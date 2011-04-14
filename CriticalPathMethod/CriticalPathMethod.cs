@@ -33,9 +33,6 @@ namespace ComputerEngineering
         private static void Main(string[] args)
         {
             do {
-                //Console.BackgroundColor = ConsoleColor.White;
-                //Console.ForegroundColor = ConsoleColor.Black;
-
                 Console.Clear();
 
                 Console.Title = "CPM - Critical Path Method C# Sample Application";
@@ -125,15 +122,15 @@ namespace ComputerEngineering
         /// <returns>list</returns>
         private static Activity[] WalkListAhead(Activity[] list)
         {
-            list[0].Eet = list[0].Est + list[0].Duration;
+            list[0].EarliestEndTime = list[0].EarliestStartTime + list[0].Duration;
 
             for (int i = 1; i < na; i++) {
                 foreach (Activity activity in list[i].Predecessors) {
-                    if (list[i].Est < activity.Eet)
-                        list[i].Est = activity.Eet;
+                    if (list[i].EarliestStartTime < activity.EarliestEndTime)
+                        list[i].EarliestStartTime = activity.EarliestEndTime;
                 }
 
-                list[i].Eet = list[i].Est + list[i].Duration;
+                list[i].EarliestEndTime = list[i].EarliestStartTime + list[i].Duration;
             }
 
             return list;
@@ -147,19 +144,19 @@ namespace ComputerEngineering
         /// <returns>list</returns>
         private static Activity[] WalkListAback(Activity[] list)
         {
-            list[na - 1].Let = list[na - 1].Eet;
-            list[na - 1].Lst = list[na - 1].Let - list[na - 1].Duration;
+            list[na - 1].LatestEndTime = list[na - 1].EarliestEndTime;
+            list[na - 1].LatestStartTime = list[na - 1].LatestEndTime - list[na - 1].Duration;
 
             for (int i = na - 2; i >= 0; i--) {
                 foreach (Activity activity in list[i].Successors) {
-                    if (list[i].Let == 0)
-                        list[i].Let = activity.Lst;
+                    if (list[i].LatestEndTime == 0)
+                        list[i].LatestEndTime = activity.LatestStartTime;
                     else
-                        if (list[i].Let > activity.Lst)
-                            list[i].Let = activity.Lst;
+                        if (list[i].LatestEndTime > activity.LatestStartTime)
+                            list[i].LatestEndTime = activity.LatestStartTime;
                 }
 
-                list[i].Lst = list[i].Let - list[i].Duration;
+                list[i].LatestStartTime = list[i].LatestEndTime - list[i].Duration;
             }
 
             return list;
@@ -177,15 +174,15 @@ namespace ComputerEngineering
             Console.Write("\n          Critical Path: ");
 
             foreach (Activity activity in list) {
-                if ((activity.Eet - activity.Let == 0) && (activity.Est - activity.Lst == 0)) {
+                if ((activity.EarliestEndTime - activity.LatestEndTime == 0) && (activity.EarliestStartTime - activity.LatestStartTime == 0)) {
                     // This activity is on the critical path
                     Console.Write("{0} ", activity.Id);
                     sb.AppendFormat("{0} ", activity.Id);
                 }
             }
-            sb.Append("\r\n" + list[list.Length - 1].Eet);
+            sb.Append("\r\n" + list[list.Length - 1].EarliestEndTime);
             var output = System.IO.File.ReadAllText("output.txt");
-            Console.Write("\n\n         Total duration: {0}\n\n", list[list.Length - 1].Eet);
+            Console.Write("\n\n         Total duration: {0}\n\n", list[list.Length - 1].EarliestEndTime);
             System.Diagnostics.Debug.Assert(sb.ToString().CompareTo(output.Trim()) == 0);
         }
     }

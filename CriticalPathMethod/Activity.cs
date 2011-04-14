@@ -42,23 +42,23 @@ namespace CriticalPathMethod
       /// <summary>
       /// Earliest start time
       /// </summary>
-      public int Est { get; set; }
+      public int EarliestStartTime { get; set; }
 
       /// <summary>
       ///  Latest start time
       /// </summary>
-      public int Lst { get; set; }
+      public int LatestStartTime { get; set; }
 
       /// <summary>
       /// Earliest end time
       /// </summary>
-      public int Eet { get; set; }
+      public int EarliestEndTime { get; set; }
 
 
       /// <summary>
       /// Latest end time
       /// </summary>
-      public int Let { get; set; }
+      public int LatestEndTime { get; set; }
 
       /// <summary>
       /// Activities that come before the activity.
