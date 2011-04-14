@@ -19,158 +19,58 @@ namespace CriticalPathMethod
   /// </summary>
   public class Activity
   {
-    private string id;
-    private string description;
-    private int duration;
-    private int est;
-    private int lst;
-    private int eet;
-    private int let;
-    private Activity[] successors;
-    private Activity[] predecessors;
-
-    public Activity()
+      public Activity()
     {
       // TODO: Add Constructor Logic here
     }
 
-    /// <summary>
-    /// Identification concerning the activity.
-    /// </summary>
-    public string Id
-    {
-      get
-      {
-        return id;
-      }
-      set
-      {
-        id = value;
-      }
-    }
+      /// <summary>
+      /// Identification concerning the activity.
+      /// </summary>
+      public string Id { get; set; }
 
-    /// <summary>
-    /// Brief description concerning the activity.
-    /// </summary>
-    public string Description
-    {
-      get
-      {
-        return description;
-      }
-      set
-      {
-        description = value;
-      }
-    }
+      /// <summary>
+      /// Brief description concerning the activity.
+      /// </summary>
+      public string Description { get; set; }
 
-    /// <summary>
-    /// Total amount of time taken by the activity.
-    /// </summary>
-    public int Duration
-    {
-      get
-      {
-        return duration;
-      }
-      set
-      {
-        duration = value;
-      }
-    }
+      /// <summary>
+      /// Total amount of time taken by the activity.
+      /// </summary>
+      public int Duration { get; set; }
 
-    /// <summary>
-    /// Earliest start time
-    /// </summary>
-    public int Est
-    {
-      get
-      {
-        return est;
-      }
-      set
-      {
-        est = value;
-      }
-    }
+      /// <summary>
+      /// Earliest start time
+      /// </summary>
+      public int Est { get; set; }
 
-    /// <summary>
-    ///  Latest start time
-    /// </summary>
-    public int Lst
-    {
-      get
-      {
-        return lst;
-      }
-      set
-      {
-        lst = value;
-      }
-    }
+      /// <summary>
+      ///  Latest start time
+      /// </summary>
+      public int Lst { get; set; }
 
-    /// <summary>
-    /// Earliest end time
-    /// </summary>
-    public int Eet
-    {
-      get
-      {
-        return eet;
-      }
-      set
-      {
-        eet = value;
-      }
-    }
+      /// <summary>
+      /// Earliest end time
+      /// </summary>
+      public int Eet { get; set; }
 
 
-    /// <summary>
-    /// Latest end time
-    /// </summary>
-    public int Let
-    {
-      get
-      {
-        return let;
-      }
-      set
-      {
-        let = value;
-      }
-    }
+      /// <summary>
+      /// Latest end time
+      /// </summary>
+      public int Let { get; set; }
 
-    /// <summary>
-    /// Activities that come before the activity.
-    /// </summary>
-    public Activity[] Predecessors
-    {
-      get
-      {
-        return predecessors;
-      }
-      set
-      {
-        predecessors = value;
-      }
-    }
+      /// <summary>
+      /// Activities that come before the activity.
+      /// </summary>
+      public Activity[] Predecessors { get; set; }
 
-    /// <summary>
-    /// Activities that come after the activity.
-    /// </summary>
-    public Activity[] Successors
-    {
-      get
-      {
-        return successors;
-      }
-      set
-      {
-        successors = value;
-      }
-    }
+      /// <summary>
+      /// Activities that come after the activity.
+      /// </summary>
+      public Activity[] Successors { get; set; }
 
-    /// <summary>
+      /// <summary>
     /// Performs a check to verify if an activity exists.
     /// </summary>
     /// <param name="list">Array storing the activities already entered.</param>
@@ -221,7 +121,7 @@ namespace CriticalPathMethod
     {
       if(aux.Successors != null)
       {
-        Activity aux2 = new Activity();
+        var aux2 = new Activity();
         aux2.Successors = new Activity[aux.Successors.Length + 1];
         aux.Successors.CopyTo(aux2.Successors, 0);
         aux2.Successors[aux.Successors.Length] = activity;
