@@ -35,7 +35,7 @@ namespace ComputerEngineering
         /// </summary>
         /// <param name="list">Array to store the activities that'll be evaluated.</param>
         /// <returns>list</returns>
-        private static IList<Activity> GetActivities()
+        private static IEnumerable<Activity> GetActivities()
         {
             var list = new List<Activity>();
             var input = System.IO.File.ReadAllLines("input.txt");
@@ -99,19 +99,22 @@ namespace ComputerEngineering
         }
 
         /// <summary>
-        /// Performs the walk aback inside the array of activities calculating for each
-        /// activity its latest start time and latest end time.
+        /// Performs the reverse walk inside the array of activities calculating for each
+        /// activity its latest start time and latest end time.  Must be called after the
+        /// forward walk
         /// </summary>
         /// <param name="list">Array storing the activities already entered.</param>
         /// <returns>list</returns>
-        private static void WalkListAback(IEnumerable<Activity> origlist) {
-            var list = origlist.Reverse();
-            var first = list.FirstOrDefault();
-            if (first == null) return;
-            first.LatestEndTime = first.EarliestEndTime;
-            first.LatestStartTime = first.LatestEndTime - first.Duration;
+        private static void WalkListAback(IEnumerable<Activity> list) {
+            var reversedList = list.Reverse();
+            var isFirst = true;
 
-            foreach(var activity in list) {
+            foreach(var activity in reversedList) {
+                if (isFirst) {
+                    activity.LatestEndTime = activity.EarliestEndTime;
+                    isFirst = false;
+                }
+
                 foreach (Activity successor in activity.Successors) {
                     if (activity.LatestEndTime == 0)
                         activity.LatestEndTime = successor.LatestStartTime;
@@ -131,7 +134,7 @@ namespace ComputerEngineering
         /// criteria. Plus, prints out the project's total duration. 
         /// </summary>
         /// <param name="list">Array containg the activities already entered.</param>
-        private static void CriticalPath(IList<Activity> list)
+        private static void CriticalPath(IEnumerable<Activity> list)
         {
             var sb = new StringBuilder();
             Console.Write("\n          Critical Path: ");
@@ -144,9 +147,9 @@ namespace ComputerEngineering
                 }
             }
             sb.Remove(sb.Length - 1, 1);
-            sb.Append("\r\n" + list[list.Count - 1].EarliestEndTime);
+            sb.Append("\r\n" + list.Last().EarliestEndTime);
             var output = System.IO.File.ReadAllText("output.txt");
-            Console.Write("\n\n         Total duration: {0}\n\n", list[list.Count - 1].EarliestEndTime);
+            Console.Write("\n\n         Total duration: {0}\n\n", list.Last().EarliestEndTime);
             System.Diagnostics.Debug.Assert(sb.ToString().CompareTo(output.Trim()) == 0);
         }
     }
