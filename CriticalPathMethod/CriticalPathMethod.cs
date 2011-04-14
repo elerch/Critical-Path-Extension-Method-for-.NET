@@ -104,21 +104,23 @@ namespace ComputerEngineering
         /// </summary>
         /// <param name="list">Array storing the activities already entered.</param>
         /// <returns>list</returns>
-        private static void WalkListAback(IList<Activity> list)
-        {
-            list[list.Count - 1].LatestEndTime = list[list.Count - 1].EarliestEndTime;
-            list[list.Count - 1].LatestStartTime = list[list.Count - 1].LatestEndTime - list[list.Count - 1].Duration;
+        private static void WalkListAback(IEnumerable<Activity> origlist) {
+            var list = origlist.Reverse();
+            var first = list.FirstOrDefault();
+            if (first == null) return;
+            first.LatestEndTime = first.EarliestEndTime;
+            first.LatestStartTime = first.LatestEndTime - first.Duration;
 
-            for (int i = list.Count - 2; i >= 0; i--) {
-                foreach (Activity activity in list[i].Successors) {
-                    if (list[i].LatestEndTime == 0)
-                        list[i].LatestEndTime = activity.LatestStartTime;
+            foreach(var activity in list) {
+                foreach (Activity successor in activity.Successors) {
+                    if (activity.LatestEndTime == 0)
+                        activity.LatestEndTime = successor.LatestStartTime;
                     else
-                        if (list[i].LatestEndTime > activity.LatestStartTime)
-                            list[i].LatestEndTime = activity.LatestStartTime;
+                        if (activity.LatestEndTime > successor.LatestStartTime)
+                            activity.LatestEndTime = successor.LatestStartTime;
                 }
 
-                list[i].LatestStartTime = list[i].LatestEndTime - list[i].Duration;
+                activity.LatestStartTime = activity.LatestEndTime - activity.Duration;
             }
         }
 
