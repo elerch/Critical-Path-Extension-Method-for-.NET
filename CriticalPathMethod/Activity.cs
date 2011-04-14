@@ -19,6 +19,10 @@ namespace CriticalPathMethod
     /// </summary>
     public class Activity
     {
+        public Activity() {
+            Predecessors = new List<Activity>();
+            Successors = new List<Activity>();
+        }
         /// <summary>
         /// Identification concerning the activity.
         /// </summary>
@@ -58,12 +62,12 @@ namespace CriticalPathMethod
         /// <summary>
         /// Activities that come before the activity.
         /// </summary>
-        public Activity[] Predecessors { get; set; }
+        public ICollection<Activity> Predecessors { get; private set; }
 
         /// <summary>
         /// Activities that come after the activity.
         /// </summary>
-        public Activity[] Successors { get; set; }
+        public ICollection<Activity> Successors { get; private set; }
 
         /// <summary>
         /// Returns the index of a given activity.
@@ -79,35 +83,6 @@ namespace CriticalPathMethod
                     return j;
             }
             return 0;
-        }
-
-        /// <summary>
-        /// Fills out the aux's array of successors by checking if it has already been
-        /// filled up.
-        /// If so, instantiates a new aux2 that'll store the aux's current
-        /// successors plus the activity that's being entered. After that, aux receives the
-        /// reference of aux2.
-        /// Otherwise, store the activity being entered in the first index of aux's
-        /// successors array.  
-        /// </summary>
-        /// <param name="aux">Activity serving as an auxiliary referencing an existing
-        /// activity.</param>
-        /// <param name="activity">Activity being entered.</param>
-        /// <returns>aux</returns>
-        public Activity SetSuccessors(Activity aux, Activity activity)
-        {
-            if (aux.Successors != null) {
-                var aux2 = new Activity();
-                aux2.Successors = new Activity[aux.Successors.Length + 1];
-                aux.Successors.CopyTo(aux2.Successors, 0);
-                aux2.Successors[aux.Successors.Length] = activity;
-                aux.Successors = aux2.Successors;
-            }
-            else {
-                aux.Successors = new Activity[1];
-                aux.Successors[0] = activity;
-            }
-            return aux;
         }
     }
 }

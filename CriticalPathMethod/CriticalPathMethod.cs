@@ -66,8 +66,6 @@ namespace ComputerEngineering
                 Console.WriteLine(" Number of predecessors: ", np);
 
                 if (np != 0) {
-                    activity.Predecessors = new Activity[np];
-
                     for (int j = 0; j < np; j++) {
                         var id = elements[4 + j];
                         Console.WriteLine("    #{0} predecessor's ID: " + id, j + 1);
@@ -75,9 +73,8 @@ namespace ComputerEngineering
                         if (!ad.ContainsKey(id)) throw new InvalidOperationException();
                         var aux = ad[id];
 
-                        activity.Predecessors[j] = aux;
-
-                        list[Activity.GetIndex(list, aux, inx)] = aux.SetSuccessors(aux, activity);
+                        activity.Predecessors.Add(aux);
+                        aux.Successors.Add(activity);
                     }
                 }
                 list[inx++] = activity;
