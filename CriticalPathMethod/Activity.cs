@@ -66,29 +66,13 @@ namespace CriticalPathMethod
         public Activity[] Successors { get; set; }
 
         /// <summary>
-        /// Performs a check to verify if an activity exists.
-        /// </summary>
-        /// <param name="list">Array storing the activities already entered.</param>
-        /// <param name="id">ID being checked.</param>
-        /// <param name="i">Current activities' array index.</param>
-        /// <returns>Found activity or null.</returns>
-        public Activity CheckActivity(Activity[] list, string id, int i)
-        {
-            for (int j = 0; j < i; j++) {
-                if (list[j].Id == id)
-                    return list[j];
-            }
-            return null;
-        }
-
-        /// <summary>
         /// Returns the index of a given activity.
         /// </summary>
         /// <param name="aux">Activity serving as an auxiliary referencing an existing
         /// activity.</param>
         /// <param name="i">Current activities' array index.</param>
         /// <returns>index</returns>
-        public int GetIndex(Activity[] list, Activity aux, int i)
+        public static int GetIndex(Activity[] list, Activity aux, int i)
         {
             for (int j = 1; j < i; j++) {
                 if (list[j].Id == aux.Id)

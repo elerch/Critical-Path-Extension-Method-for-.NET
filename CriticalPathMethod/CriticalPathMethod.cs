@@ -12,19 +12,12 @@ using System;
 using System.Collections;
 using System.Text;
 using CriticalPathMethod;
+using System.Collections.Generic;
 
 namespace ComputerEngineering
 {
     class CPM
     {
-        /// <summary>
-        /// Implements a Critical Path Method framework.
-        /// </summary>
-        public CPM()
-        {
-            // TODO: Add Constructor Logic here
-        }
-
         /// <summary>
         /// Number of activities
         /// </summary>
@@ -32,30 +25,14 @@ namespace ComputerEngineering
 
         private static void Main(string[] args)
         {
-            do {
-                Console.Clear();
+            // Array to store the activities that'll be evaluated.
+            Activity[] list = null;
 
-                Console.Title = "CPM - Critical Path Method C# Sample Application";
+            list = GetActivities(list);
+            list = WalkListAhead(list);
+            list = WalkListAback(list);
 
-                // Prints startup banner
-                Console.Write("\nCPM - Critical Path Method C# Sample Application\n");
-                Console.Write("Copyright ©2006 Leniel Braz de Oliveira Macaferi & Wellington Magalhães Leite.\n\n");
-                Console.Write("UBM COMPUTER ENGINEERING - 7TH TERM [http://www.ubm.br/]\n\n");
-
-                Console.Write("This program example demonstrates the Critical Path Method's algorithm.\n");
-
-                // Array to store the activities that'll be evaluated.
-                Activity[] list = null;
-
-                list = GetActivities(list);
-                list = WalkListAhead(list);
-                list = WalkListAback(list);
-
-                CriticalPath(list);
-
-                Console.Write(" Do you wanna a new critical path solution? y\\n: ");
-            }
-            while (Console.ReadKey().KeyChar == 'y' || Console.ReadKey().KeyChar == 'Y');
+            CriticalPath(list);
         }
 
         /// <summary>
@@ -66,6 +43,7 @@ namespace ComputerEngineering
         private static Activity[] GetActivities(Activity[] list)
         {
             var input = System.IO.File.ReadAllLines("input.txt");
+            var ad = new Dictionary<string, Activity>();
             Console.Write("\n       Number of activities: " + input.Length);
             na = input.Length;
             list = new Activity[na];
@@ -77,7 +55,7 @@ namespace ComputerEngineering
 
                 activity.Id = elements[0];
                 Console.WriteLine("\n                     ID: " + activity.Id);
-
+                ad.Add(activity.Id, activity);
                 activity.Description = elements[1];
                 Console.WriteLine("            Description: " + activity.Description);
 
@@ -90,22 +68,16 @@ namespace ComputerEngineering
                 if (np != 0) {
                     activity.Predecessors = new Activity[np];
 
-                    string id;
-
                     for (int j = 0; j < np; j++) {
-                        id = elements[4 + j];
+                        var id = elements[4 + j];
                         Console.WriteLine("    #{0} predecessor's ID: " + id, j + 1);
+                        
+                        if (!ad.ContainsKey(id)) throw new InvalidOperationException();
+                        var aux = ad[id];
 
-                        Activity aux = new Activity();
+                        activity.Predecessors[j] = aux;
 
-                        if ((aux = aux.CheckActivity(list, id, inx)) != null) {
-                            activity.Predecessors[j] = aux;
-
-                            list[aux.GetIndex(list, aux, inx)] = aux.SetSuccessors(aux, activity);
-                        }
-                        else {
-                            throw new InvalidOperationException();
-                        }
+                        list[Activity.GetIndex(list, aux, inx)] = aux.SetSuccessors(aux, activity);
                     }
                 }
                 list[inx++] = activity;
@@ -169,7 +141,8 @@ namespace ComputerEngineering
         /// criteria. Plus, prints out the project's total duration. 
         /// </summary>
         /// <param name="list">Array containg the activities already entered.</param>
-        private static void CriticalPath(Activity[] list) {
+        private static void CriticalPath(Activity[] list)
+        {
             var sb = new StringBuilder();
             Console.Write("\n          Critical Path: ");
 
@@ -180,6 +153,7 @@ namespace ComputerEngineering
                     sb.AppendFormat("{0} ", activity.Id);
                 }
             }
+            sb.Remove(sb.Length - 1, 1);
             sb.Append("\r\n" + list[list.Length - 1].EarliestEndTime);
             var output = System.IO.File.ReadAllText("output.txt");
             Console.Write("\n\n         Total duration: {0}\n\n", list[list.Length - 1].EarliestEndTime);
