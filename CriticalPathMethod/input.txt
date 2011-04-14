@@ -12,8 +12,8 @@ M m 4 1 I
 N n 3 1 M
 K k 2 3 L F N
 Z z 4 1 L
-O o 2 1 K
 P p 11 1 O
+O o 2 1 K
 Q q 7 1 P
 T t 10 1 O
 U u 8 1 T

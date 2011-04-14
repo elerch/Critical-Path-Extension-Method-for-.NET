@@ -68,7 +68,9 @@ namespace CriticalPathMethod
         /// Activities that come after the activity.
         /// </summary>
         public ICollection<Activity> Successors { get; private set; }
-
+        public override string ToString() {
+            return Id;
+        }
     }
 }
 

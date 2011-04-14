@@ -24,10 +24,27 @@ namespace ComputerEngineering
         {
             // Array to store the activities that'll be evaluated.
             var list = GetActivities();
+            list = OrderByDependencies(list);
             WalkListAhead(list);
             WalkListAback(list);
 
             CriticalPath(list);
+        }
+
+        private static IEnumerable<Activity> OrderByDependencies(IEnumerable<Activity> list) {
+            var processedActivities = new HashSet<Activity>();
+            var totalCount = list.Count();
+            var rc = new List<Activity>(totalCount);
+            while(rc.Count < totalCount) {
+                foreach (var activity in list) {
+                    if (!processedActivities.Contains(activity)
+                        && activity.Predecessors.All(processedActivities.Contains)) {
+                        rc.Add(activity);
+                        processedActivities.Add(activity);
+                    }
+                }
+            }
+            return rc;
         }
 
         /// <summary>
@@ -40,6 +57,7 @@ namespace ComputerEngineering
             var list = new List<Activity>();
             var input = System.IO.File.ReadAllLines("input.txt");
             var ad = new Dictionary<string, Activity>();
+            var deferredList = new Dictionary<Activity, List<string>>();
             Console.Write("\n       Number of activities: " + input.Length);
 
             int inx = 0;
@@ -61,18 +79,45 @@ namespace ComputerEngineering
                 Console.WriteLine(" Number of predecessors: ", np);
 
                 if (np != 0) {
+                    var allIds = new List<string>();
                     for (int j = 0; j < np; j++) {
-                        var id = elements[4 + j];
-                        Console.WriteLine("    #{0} predecessor's ID: " + id, j + 1);
+                        allIds.Add(elements[4 + j]);
+                        Console.WriteLine("    #{0} predecessor's ID: " + elements[4 + j], j + 1);
+                    }
 
-                        if (!ad.ContainsKey(id)) throw new InvalidOperationException();
-                        var aux = ad[id];
+                    if (allIds.Any(i => !ad.ContainsKey(i))) {
+                        // Defer processing on this one
+                        deferredList.Add(activity, allIds);
+                    }
+                    else {
+                        foreach (var id in allIds) {
+                            var aux = ad[id];
 
-                        activity.Predecessors.Add(aux);
-                        aux.Successors.Add(activity);
+                            activity.Predecessors.Add(aux);
+                            aux.Successors.Add(activity);
+                        }
                     }
                 }
                 list.Add(activity);
+            }
+
+            while (deferredList.Count > 0) {
+                var processedActivities = new List<Activity>();
+                foreach (var activity in deferredList) {
+                    if (activity.Value.Where(ad.ContainsKey).Count() == activity.Value.Count) {
+                        // All dependencies are now loaded
+                        foreach (var id in activity.Value) {
+                            var aux = ad[id];
+
+                            activity.Key.Predecessors.Add(aux);
+                            aux.Successors.Add(activity.Key);
+                        }
+                        processedActivities.Add(activity.Key);
+                    }
+                }
+                foreach (var activity in processedActivities) {
+                    deferredList.Remove(activity);
+                }                
             }
 
             return list;
