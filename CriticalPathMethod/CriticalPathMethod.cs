@@ -18,19 +18,13 @@ namespace ComputerEngineering
 {
     class CPM
     {
-        /// <summary>
-        /// Number of activities
-        /// </summary>
-        private static int na;
 
         private static void Main(string[] args)
         {
             // Array to store the activities that'll be evaluated.
-            Activity[] list = null;
-
-            list = GetActivities(list);
-            list = WalkListAhead(list);
-            list = WalkListAback(list);
+            var list = GetActivities();
+            WalkListAhead(list);
+            WalkListAback(list);
 
             CriticalPath(list);
         }
@@ -40,13 +34,12 @@ namespace ComputerEngineering
         /// </summary>
         /// <param name="list">Array to store the activities that'll be evaluated.</param>
         /// <returns>list</returns>
-        private static Activity[] GetActivities(Activity[] list)
-        {
+        private static IList<Activity> GetActivities() {
+            var list = new List<Activity>();
             var input = System.IO.File.ReadAllLines("input.txt");
             var ad = new Dictionary<string, Activity>();
             Console.Write("\n       Number of activities: " + input.Length);
-            na = input.Length;
-            list = new Activity[na];
+
             int inx = 0;
             foreach (var line in input) {
                 var activity = new Activity();
@@ -77,7 +70,7 @@ namespace ComputerEngineering
                         aux.Successors.Add(activity);
                     }
                 }
-                list[inx++] = activity;
+                list.Add(activity);
             }
 
             return list;
@@ -89,20 +82,17 @@ namespace ComputerEngineering
         /// </summary>
         /// <param name="list">Array storing the activities already entered.</param>
         /// <returns>list</returns>
-        private static Activity[] WalkListAhead(Activity[] list)
+        private static void WalkListAhead(IList<Activity> list)
         {
             list[0].EarliestEndTime = list[0].EarliestStartTime + list[0].Duration;
 
-            for (int i = 1; i < na; i++) {
+            for (int i = 1; i < list.Count; i++) {
                 foreach (Activity activity in list[i].Predecessors) {
                     if (list[i].EarliestStartTime < activity.EarliestEndTime)
                         list[i].EarliestStartTime = activity.EarliestEndTime;
                 }
-
                 list[i].EarliestEndTime = list[i].EarliestStartTime + list[i].Duration;
             }
-
-            return list;
         }
 
         /// <summary>
@@ -111,12 +101,12 @@ namespace ComputerEngineering
         /// </summary>
         /// <param name="list">Array storing the activities already entered.</param>
         /// <returns>list</returns>
-        private static Activity[] WalkListAback(Activity[] list)
+        private static void WalkListAback(IList<Activity> list)
         {
-            list[na - 1].LatestEndTime = list[na - 1].EarliestEndTime;
-            list[na - 1].LatestStartTime = list[na - 1].LatestEndTime - list[na - 1].Duration;
+            list[list.Count - 1].LatestEndTime = list[list.Count - 1].EarliestEndTime;
+            list[list.Count - 1].LatestStartTime = list[list.Count - 1].LatestEndTime - list[list.Count - 1].Duration;
 
-            for (int i = na - 2; i >= 0; i--) {
+            for (int i = list.Count - 2; i >= 0; i--) {
                 foreach (Activity activity in list[i].Successors) {
                     if (list[i].LatestEndTime == 0)
                         list[i].LatestEndTime = activity.LatestStartTime;
@@ -127,8 +117,6 @@ namespace ComputerEngineering
 
                 list[i].LatestStartTime = list[i].LatestEndTime - list[i].Duration;
             }
-
-            return list;
         }
 
         /// <summary>
@@ -138,7 +126,7 @@ namespace ComputerEngineering
         /// criteria. Plus, prints out the project's total duration. 
         /// </summary>
         /// <param name="list">Array containg the activities already entered.</param>
-        private static void CriticalPath(Activity[] list)
+        private static void CriticalPath(IList<Activity> list)
         {
             var sb = new StringBuilder();
             Console.Write("\n          Critical Path: ");
@@ -151,9 +139,9 @@ namespace ComputerEngineering
                 }
             }
             sb.Remove(sb.Length - 1, 1);
-            sb.Append("\r\n" + list[list.Length - 1].EarliestEndTime);
+            sb.Append("\r\n" + list[list.Count - 1].EarliestEndTime);
             var output = System.IO.File.ReadAllText("output.txt");
-            Console.Write("\n\n         Total duration: {0}\n\n", list[list.Length - 1].EarliestEndTime);
+            Console.Write("\n\n         Total duration: {0}\n\n", list[list.Count - 1].EarliestEndTime);
             System.Diagnostics.Debug.Assert(sb.ToString().CompareTo(output.Trim()) == 0);
         }
     }
