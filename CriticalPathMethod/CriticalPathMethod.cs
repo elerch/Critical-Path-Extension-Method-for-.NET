@@ -23,8 +23,7 @@ namespace ComputerEngineering
         private static void Main(string[] args)
         {
             // Array to store the activities that'll be evaluated.
-            var list = GetActivities();
-            list = OrderByDependencies(list);
+            var list = OrderByDependencies(GetActivities());
             WalkListAhead(list);
             WalkListAback(list);
 
