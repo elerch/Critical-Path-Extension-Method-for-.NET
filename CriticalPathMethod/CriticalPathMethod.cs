@@ -41,10 +41,10 @@ namespace ComputerEngineering
                         && activity.Predecessors.All(processedActivities.Contains)) {
                         rc.Add(activity);
                         processedActivities.Add(activity);
+                        yield return activity;
                     }
                 }
             }
-            return rc;
         }
 
         /// <summary>
