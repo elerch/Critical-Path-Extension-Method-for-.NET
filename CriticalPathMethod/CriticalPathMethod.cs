@@ -67,38 +67,29 @@ namespace ComputerEngineering
     /// </summary>
     /// <param name="list">Array to store the activities that'll be evaluated.</param>
     /// <returns>list</returns>
-    private static Activity[] GetActivities(Activity[] list)
-    {
-      do
-      {
-        Console.Write("\n       Number of activities: ");
-        if((na = int.Parse(Console.ReadLine())) < 2)
-        {
-          Console.Beep();
-          Console.Write("\n Invalid entry. The number must be >= 2.\n");
-        }
-      }
-      while(na < 2);
-
+    private static Activity[] GetActivities(Activity[] list) {
+        var input = System.IO.File.ReadAllLines("input.txt");
+        Console.Write("\n       Number of activities: " + input.Length);
+        na = input.Length;
       list = new Activity[na];
-
-      for(int i = 0; i < na; i++)
+        int inx = 0;
+      foreach(var line in input)
       {
-        Activity activity = new Activity();
+        var activity = new Activity();
+          var elements = line.Split(' ');
+          Console.WriteLine("\n                Activity {0}\n", inx + 1);
 
-        Console.Write("\n                Activity {0}\n", i + 1);
+        activity.Id = elements[0];
+        Console.WriteLine("\n                     ID: " + activity.Id);
 
-        Console.Write("\n                     ID: ", i + 1);
-        activity.Id = Console.ReadLine();
+        activity.Description = elements[1];
+        Console.WriteLine("            Description: "+activity.Description);
 
-        Console.Write("            Description: ", i + 1);
-        activity.Description = Console.ReadLine();
+        activity.Duration = int.Parse(elements[2]);
+        Console.WriteLine("               Duration: "+ activity.Duration);
 
-        Console.Write("               Duration: ", i + 1);
-        activity.Duration = int.Parse(Console.ReadLine());
-
-        Console.Write(" Number of predecessors: ", i + 1);
-        int np = int.Parse(Console.ReadLine());
+        int np = int.Parse(elements[3]);
+        Console.WriteLine(" Number of predecessors: ", np);
 
         if(np != 0)
         {
@@ -108,26 +99,23 @@ namespace ComputerEngineering
 
           for(int j = 0; j < np; j++)
           {
-            Console.Write("    #{0} predecessor's ID: ", j + 1);
-            id = Console.ReadLine();
+            id = elements[4 + j];
+            Console.WriteLine("    #{0} predecessor's ID: " + id, j+1);
 
             Activity aux = new Activity();
 
-            if((aux = aux.CheckActivity(list, id, i)) != null)
+            if ((aux = aux.CheckActivity(list, id, inx)) != null)
             {
               activity.Predecessors[j] = aux;
 
-              list[aux.GetIndex(list, aux, i)] = aux.SetSuccessors(aux, activity);
+              list[aux.GetIndex(list, aux, inx)] = aux.SetSuccessors(aux, activity);
             }
-            else
-            {
-              Console.Beep();
-              Console.Write("\n No match found! Try again.\n\n");
-              j--;
+            else {
+                throw new InvalidOperationException();
             }
           }
         }
-        list[i] = activity;
+        list[inx++] = activity;
       }
 
       return list;

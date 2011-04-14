@@ -1,0 +1,23 @@
+A a 3 0 
+B b 4 1 A
+C c 2 1 A
+E e 5 1 A
+G g 3 1 A
+H h 7 3 C E G
+J j 8 2 H B
+F f 5 1 H
+I i 6 1 G
+L l 1 1 J
+M m 4 1 I
+N n 3 1 M
+K k 2 3 L F N
+Z z 4 1 L
+O o 2 1 K
+P p 11 1 O
+Q q 7 1 P
+T t 10 1 O
+U u 8 1 T
+R r 1 1 Q
+S s 2 2 R U
+V v 4 2 Z S
+X x 3 1 V
