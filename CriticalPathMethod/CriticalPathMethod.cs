@@ -10,6 +10,7 @@
 
 using System;
 using System.Collections;
+using System.Linq;
 using System.Text;
 using CriticalPathMethod;
 using System.Collections.Generic;
@@ -34,7 +35,8 @@ namespace ComputerEngineering
         /// </summary>
         /// <param name="list">Array to store the activities that'll be evaluated.</param>
         /// <returns>list</returns>
-        private static IList<Activity> GetActivities() {
+        private static IList<Activity> GetActivities()
+        {
             var list = new List<Activity>();
             var input = System.IO.File.ReadAllLines("input.txt");
             var ad = new Dictionary<string, Activity>();
@@ -62,7 +64,7 @@ namespace ComputerEngineering
                     for (int j = 0; j < np; j++) {
                         var id = elements[4 + j];
                         Console.WriteLine("    #{0} predecessor's ID: " + id, j + 1);
-                        
+
                         if (!ad.ContainsKey(id)) throw new InvalidOperationException();
                         var aux = ad[id];
 
@@ -82,16 +84,17 @@ namespace ComputerEngineering
         /// </summary>
         /// <param name="list">Array storing the activities already entered.</param>
         /// <returns>list</returns>
-        private static void WalkListAhead(IList<Activity> list)
+        private static void WalkListAhead(IEnumerable<Activity> list)
         {
-            list[0].EarliestEndTime = list[0].EarliestStartTime + list[0].Duration;
+            var firstItem = list.FirstOrDefault();
+            if (firstItem == null) return;
 
-            for (int i = 1; i < list.Count; i++) {
-                foreach (Activity activity in list[i].Predecessors) {
-                    if (list[i].EarliestStartTime < activity.EarliestEndTime)
-                        list[i].EarliestStartTime = activity.EarliestEndTime;
+            foreach (var activity in list) {
+                foreach (var predecessor in activity.Predecessors) {
+                    if (activity.EarliestStartTime < predecessor.EarliestEndTime)
+                        activity.EarliestStartTime = predecessor.EarliestEndTime;
                 }
-                list[i].EarliestEndTime = list[i].EarliestStartTime + list[i].Duration;
+                activity.EarliestEndTime = activity.EarliestStartTime + activity.Duration;
             }
         }
 
