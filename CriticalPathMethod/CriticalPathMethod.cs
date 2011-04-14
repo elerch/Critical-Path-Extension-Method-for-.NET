@@ -172,17 +172,21 @@ namespace ComputerEngineering
         /// criteria. Plus, prints out the project's total duration. 
         /// </summary>
         /// <param name="list">Array containg the activities already entered.</param>
-        private static void CriticalPath(Activity[] list)
-        {
+        private static void CriticalPath(Activity[] list) {
+            var sb = new StringBuilder();
             Console.Write("\n          Critical Path: ");
 
             foreach (Activity activity in list) {
-                if ((activity.Eet - activity.Let == 0) && (activity.Est - activity.Lst == 0))
+                if ((activity.Eet - activity.Let == 0) && (activity.Est - activity.Lst == 0)) {
                     // This activity is on the critical path
                     Console.Write("{0} ", activity.Id);
+                    sb.AppendFormat("{0} ", activity.Id);
+                }
             }
-
+            sb.Append("\r\n" + list[list.Length - 1].Eet);
+            var output = System.IO.File.ReadAllText("output.txt");
             Console.Write("\n\n         Total duration: {0}\n\n", list[list.Length - 1].Eet);
+            System.Diagnostics.Debug.Assert(sb.ToString().CompareTo(output.Trim()) == 0);
         }
     }
 }
