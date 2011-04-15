@@ -69,6 +69,7 @@
   <ItemGroup>
     <Compile Include="Activity.cs" />
     <Compile Include="CriticalPathMethod.cs" />
+    <Compile Include="IEnumerableExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
