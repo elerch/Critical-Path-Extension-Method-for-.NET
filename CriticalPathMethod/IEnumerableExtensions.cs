@@ -7,7 +7,7 @@ namespace CriticalPathMethod
 {
     public static class IEnumerableExtensions
     {
-        internal static IEnumerable<Activity> OrderByDependencies(IEnumerable<Activity> list)
+        private static IEnumerable<Activity> OrderByDependencies(IEnumerable<Activity> list)
         {
             var processedActivities = new HashSet<Activity>();
             var totalCount = list.Count();
@@ -103,9 +103,9 @@ namespace CriticalPathMethod
 
         public static IEnumerable<Activity> CriticalPath(this IEnumerable<Activity> list) {
             var orderedList = OrderByDependencies(list);
-            WalkListAhead(list);
-            WalkListAback(list);
-            return CriticalPathInternal(list);            
+            WalkListAhead(orderedList);
+            WalkListAback(orderedList);
+            return CriticalPathInternal(orderedList);            
         }
 
 

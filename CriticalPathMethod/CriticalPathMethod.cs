@@ -23,7 +23,7 @@ namespace ComputerEngineering
         private static void Main(string[] args)
         {
             // Array to store the activities that'll be evaluated.
-            Output(IEnumerableExtensions.OrderByDependencies(GetActivities()).CriticalPath());
+            Output(GetActivities().CriticalPath());
 
         }
 
