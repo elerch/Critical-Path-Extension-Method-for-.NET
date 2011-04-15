@@ -23,7 +23,7 @@ namespace ComputerEngineering
         private static void Main(string[] args)
         {
             // Array to store the activities that'll be evaluated.
-            Output(GetActivities().Shuffle().CriticalPath());
+            Output(GetActivities().Shuffle().CriticalPath(p => p.Predecessors, s => s.Successors, l => (long)l.Duration));
 
         }
 
@@ -31,15 +31,16 @@ namespace ComputerEngineering
         {
             var sb = new StringBuilder();
             Console.Write("\n          Critical Path: ");
-
+            var totalDuration = 0L;
             foreach (Activity activity in list) {
                 Console.Write("{0} ", activity.Id);
                 sb.AppendFormat("{0} ", activity.Id);
+                totalDuration += activity.Duration;
             }
             sb.Remove(sb.Length - 1, 1);
-            sb.Append("\r\n" + list.Last().EarliestEndTime);
+            sb.Append("\r\n" + totalDuration);
             var output = System.IO.File.ReadAllText("output.txt");
-            Console.Write("\n\n         Total duration: {0}\n\n", list.Last().EarliestEndTime);
+            Console.Write("\n\n         Total duration: {0}\n\n", totalDuration);
             System.Diagnostics.Debug.Assert(sb.ToString().CompareTo(output.Trim()) == 0);
         }
 

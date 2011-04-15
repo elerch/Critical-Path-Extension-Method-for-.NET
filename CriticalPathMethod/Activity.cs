@@ -19,7 +19,8 @@ namespace CriticalPathMethod
     /// </summary>
     public class Activity
     {
-        public Activity() {
+        public Activity()
+        {
             Predecessors = new List<Activity>();
             Successors = new List<Activity>();
         }
@@ -39,27 +40,6 @@ namespace CriticalPathMethod
         public int Duration { get; set; }
 
         /// <summary>
-        /// Earliest start time
-        /// </summary>
-        public int EarliestStartTime { get; set; }
-
-        /// <summary>
-        ///  Latest start time
-        /// </summary>
-        public int LatestStartTime { get; set; }
-
-        /// <summary>
-        /// Earliest end time
-        /// </summary>
-        public int EarliestEndTime { get; set; }
-
-
-        /// <summary>
-        /// Latest end time
-        /// </summary>
-        public int LatestEndTime { get; set; }
-
-        /// <summary>
         /// Activities that come before the activity.
         /// </summary>
         public ICollection<Activity> Predecessors { get; private set; }
@@ -68,7 +48,9 @@ namespace CriticalPathMethod
         /// Activities that come after the activity.
         /// </summary>
         public ICollection<Activity> Successors { get; private set; }
-        public override string ToString() {
+
+        public override string ToString()
+        {
             return Id;
         }
     }
