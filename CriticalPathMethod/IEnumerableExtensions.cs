@@ -12,25 +12,25 @@ namespace CriticalPathMethod
             public IEnumerable<T> Successors { get; private set; }
 
             /// <summary>
-            /// Earliest start time
+            /// Earliest start
             /// </summary>
-            public long EarliestStartTime { get; set; }
+            public long EarliestStart { get; set; }
 
             /// <summary>
-            ///  Latest start time
+            ///  Latest start
             /// </summary>
-            public long LatestStartTime { get; set; }
+            public long LatestStart { get; set; }
 
             /// <summary>
-            /// Earliest end time
+            /// Earliest end 
             /// </summary>
-            public long EarliestEndTime { get; set; }
+            public long EarliestEnd { get; set; }
 
 
             /// <summary>
-            /// Latest end time
+            /// Latest end 
             /// </summary>
-            public long LatestEndTime { get; set; }
+            public long LatestEnd { get; set; }
 
             public PathInfo(IEnumerable<T> predecessors, IEnumerable<T> sucessors) {
                 Predecessors = predecessors;
@@ -56,53 +56,52 @@ namespace CriticalPathMethod
         }
 
         /// <summary>
-        /// Performs the walk ahead inside the array of activities calculating for each
-        /// activity its earliest start time and earliest end time.
+        /// Performs the walk ahead inside the list of nodes calculating for each
+        /// node its earliest start and earliest end.
         /// </summary>
         /// <param name="list">Dictionary of all nodes, with a PathInfo version as the key</param>
         /// <param name="lengthSelector">Function to determine the length, duration, etc for the node.  
         /// In the absence of INumeric, since we have to do math, we're going to force a long return value</param>
-        private static void WalkListAhead<T>(IDictionary<T,PathInfo<T>> list, Func<T,long> lengthSelector)
+        private static void FillEarliestValues<T>(this IDictionary<T,PathInfo<T>> list, Func<T,long> lengthSelector)
         {
             if (!list.Any()) return;
 
             foreach (var item in list) {
                 foreach (var predecessor in item.Value.Predecessors) {
-                    if (item.Value.EarliestStartTime < list[predecessor].EarliestEndTime)
-                        item.Value.EarliestStartTime = list[predecessor].EarliestEndTime;
+                    if (item.Value.EarliestStart < list[predecessor].EarliestEnd)
+                        item.Value.EarliestStart = list[predecessor].EarliestEnd;
                 }
-                item.Value.EarliestEndTime = item.Value.EarliestStartTime + lengthSelector(item.Key);
+                item.Value.EarliestEnd = item.Value.EarliestStart + lengthSelector(item.Key);
             }
         }
 
         /// <summary>
-        /// Performs the reverse walk inside the array of activities calculating for each
-        /// activity its latest start time and latest end time.  Must be called after the
-        /// forward walk
+        /// Performs the reverse walk inside the array of nodes calculating for each
+        /// node its latest start and latest end.  Must be called after the forward walk
         /// </summary>
         /// <param name="list">Dictionary of all nodes, with a PathInfo version as the key</param>
         /// <param name="lengthSelector">Function to determine the length, duration, etc for the node.  
         /// In the absence of INumeric, since we have to do math, we're going to force a long return value</param>
-        private static void WalkListAback<T>(IDictionary<T, PathInfo<T>> list, Func<T, long> lengthSelector)
+        private static void FillLatestValues<T>(this IDictionary<T, PathInfo<T>> list, Func<T, long> lengthSelector)
         {
             var reversedList = list.Reverse();
             var isFirst = true;
 
             foreach (var node in reversedList) {
                 if (isFirst) {
-                    node.Value.LatestEndTime = node.Value.EarliestEndTime;
+                    node.Value.LatestEnd = node.Value.EarliestEnd;
                     isFirst = false;
                 }
 
                 foreach (var successor in node.Value.Successors) {
-                    if (node.Value.LatestEndTime == 0)
-                        node.Value.LatestEndTime = list[successor].LatestStartTime;
+                    if (node.Value.LatestEnd == 0)
+                        node.Value.LatestEnd = list[successor].LatestStart;
                     else
-                        if (node.Value.LatestEndTime > list[successor].LatestStartTime)
-                            node.Value.LatestEndTime = list[successor].LatestStartTime;
+                        if (node.Value.LatestEnd > list[successor].LatestStart)
+                            node.Value.LatestEnd = list[successor].LatestStart;
                 }
 
-                node.Value.LatestStartTime = node.Value.LatestEndTime - lengthSelector(node.Key);
+                node.Value.LatestStart = node.Value.LatestEnd - lengthSelector(node.Key);
             }
         }
 
@@ -110,16 +109,19 @@ namespace CriticalPathMethod
         /// Calculates critical path through a series of nodes
         /// </summary>
         /// <param name="list"></param>
+        /// <param name="predecessorSelector"></param>
+        /// <param name="sucessorSelector"></param>
+        /// <param name="lengthSelector"></param>
         /// <returns></returns>
         public static IEnumerable<T> CriticalPath<T>(this IEnumerable<T> list, Func<T, IEnumerable<T>> predecessorSelector, Func<T, IEnumerable<T>> sucessorSelector, Func<T, long> lengthSelector) {
             var piList = list.ToPathInfoDicationary(predecessorSelector, sucessorSelector);
             var orderedList = OrderByDependencies(piList).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-            WalkListAhead(orderedList, lengthSelector);
-            WalkListAback(orderedList, lengthSelector);
+            orderedList.FillEarliestValues(lengthSelector);
+            orderedList.FillLatestValues(lengthSelector);
             return orderedList
                 .Where(
-                    kvp => (kvp.Value.EarliestEndTime - kvp.Value.LatestEndTime == 0)
-                        && (kvp.Value.EarliestStartTime - kvp.Value.LatestStartTime == 0))
+                    kvp => (kvp.Value.EarliestEnd - kvp.Value.LatestEnd == 0)
+                        && (kvp.Value.EarliestStart - kvp.Value.LatestStart == 0))
                 .Select(n => n.Key);
         }
 
