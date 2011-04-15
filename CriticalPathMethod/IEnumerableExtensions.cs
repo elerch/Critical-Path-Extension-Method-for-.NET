@@ -75,37 +75,18 @@ namespace CriticalPathMethod
         }
 
         /// <summary>
-        /// Calculates the critical path by verifyng if each activity's earliest end time
-        /// minus the latest end time and earliest start time minus the latest start
-        /// time are equal zero. If so, then prints out the activity id that match the
-        /// criteria. Plus, prints out the project's total duration. 
+        /// Calculates critical path through a series of nodes
         /// </summary>
-        /// <param name="list">Array containg the activities already entered.</param>
-        private static IEnumerable<Activity> CriticalPathInternal(IEnumerable<Activity> list)
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public static IEnumerable<Activity> CriticalPath(this IEnumerable<Activity> list)
         {
-            var sb = new StringBuilder();
-            var rc = new List<Activity>();
-            foreach (Activity activity in list) {
-                if ((activity.EarliestEndTime - activity.LatestEndTime == 0) && (activity.EarliestStartTime - activity.LatestStartTime == 0)) {
-                    // This activity is on the critical path
-                    Console.Write("{0} ", activity.Id);
-                    sb.AppendFormat("{0} ", activity.Id);
-                    rc.Add(activity);
-                }
-            }
-            sb.Remove(sb.Length - 1, 1);
-            sb.Append("\r\n" + list.Last().EarliestEndTime);
-            var output = System.IO.File.ReadAllText("output.txt");
-            Console.Write("\n\n         Total duration: {0}\n\n", list.Last().EarliestEndTime);
-            System.Diagnostics.Debug.Assert(sb.ToString().CompareTo(output.Trim()) == 0);
-            return rc;
-        }
-
-        public static IEnumerable<Activity> CriticalPath(this IEnumerable<Activity> list) {
             var orderedList = OrderByDependencies(list);
             WalkListAhead(orderedList);
             WalkListAback(orderedList);
-            return CriticalPathInternal(orderedList);            
+            return orderedList.Where(
+                activity => (activity.EarliestEndTime - activity.LatestEndTime == 0)
+                    && (activity.EarliestStartTime - activity.LatestStartTime == 0));
         }
 
 
