@@ -89,6 +89,10 @@ namespace CriticalPathMethod
                     && (activity.EarliestStartTime - activity.LatestStartTime == 0));
         }
 
-
+        public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> e)
+        {
+            var r = new Random();
+            return e.OrderBy(x => r.Next());
+        }
     }
 }
