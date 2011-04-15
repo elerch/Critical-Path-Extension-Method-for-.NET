@@ -23,7 +23,7 @@ namespace ComputerEngineering
         private static void Main(string[] args)
         {
             // Array to store the activities that'll be evaluated.
-            Output(GetActivities().Shuffle().CriticalPath(p => p.Predecessors, s => s.Successors, l => (long)l.Duration));
+            Output(GetActivities().Shuffle().CriticalPath(p => p.Predecessors, l => (long)l.Duration));
 
         }
 

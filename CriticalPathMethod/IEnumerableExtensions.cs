@@ -113,8 +113,9 @@ namespace CriticalPathMethod
         /// <param name="sucessorSelector"></param>
         /// <param name="lengthSelector"></param>
         /// <returns></returns>
-        public static IEnumerable<T> CriticalPath<T>(this IEnumerable<T> list, Func<T, IEnumerable<T>> predecessorSelector, Func<T, IEnumerable<T>> sucessorSelector, Func<T, long> lengthSelector) {
-            var piList = list.ToPathInfoDicationary(predecessorSelector, sucessorSelector);
+        public static IEnumerable<T> CriticalPath<T>(this IEnumerable<T> list, Func<T, IEnumerable<T>> predecessorSelector, Func<T, long> lengthSelector) {
+            var successors = list.GetSucessors(predecessorSelector);
+            var piList = list.ToPathInfoDicationary(predecessorSelector, n => successors[n]);
             var orderedList = OrderByDependencies(piList).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             orderedList.FillEarliestValues(lengthSelector);
             orderedList.FillLatestValues(lengthSelector);
@@ -123,6 +124,26 @@ namespace CriticalPathMethod
                     kvp => (kvp.Value.EarliestEnd - kvp.Value.LatestEnd == 0)
                         && (kvp.Value.EarliestStart - kvp.Value.LatestStart == 0))
                 .Select(n => n.Key);
+        }
+
+        private static IDictionary<T, IEnumerable<T>> GetSucessors<T>(this IEnumerable<T> list, Func<T, IEnumerable<T>> predecessorSelector) {
+            var rc = new Dictionary<T, IEnumerable<T>>();
+            foreach (var item in list) {
+                // Just in case this item isn't on anyone's predecessor list, 
+                // we'll need to make sure there's a dictionary entry for it
+                if (!rc.ContainsKey(item)) 
+                    rc.Add(item, new List<T>());
+
+                // Ok, go through the item's predecessors and add itself as a successor
+                foreach (var predecessor in predecessorSelector(item)) {
+                    if(!rc.ContainsKey(predecessor))
+                        rc.Add(predecessor, new List<T>());
+                    var predecessorSuccessorList =
+                            (List<T>) rc[predecessor];
+                    predecessorSuccessorList.Add(item);
+                }
+            }
+            return rc;
         }
 
         private static IDictionary<T, PathInfo<T>> ToPathInfoDicationary<T>(this IEnumerable<T> list, Func<T, IEnumerable<T>> predecessorSelector, Func<T, IEnumerable<T>> sucessorSelector) {
