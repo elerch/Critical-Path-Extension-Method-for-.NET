@@ -43,6 +43,7 @@ namespace ComputerEngineering
                             activities.CriticalPath(p => p.Predecessors, l => (long)l.Duration);
                         }
                         catch (System.InvalidOperationException ex) {
+                            System.Console.WriteLine("Found problem: " + ex.Message);
                             isCaughtProperly = true;
                         }                        
                     }

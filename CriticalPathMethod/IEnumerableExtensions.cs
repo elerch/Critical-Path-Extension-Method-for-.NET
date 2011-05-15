@@ -44,14 +44,18 @@ namespace CriticalPathMethod
             var totalCount = list.Count();
             var rc = new List<KeyValuePair<T,PathInfo<T>>>(totalCount);
             while (rc.Count < totalCount) {
+                bool foundSomethingToProcess = false;
                 foreach (var kvp in list) {
                     if (!processedPairs.Contains(kvp.Key)
                         && kvp.Value.Predecessors.All(processedPairs.Contains)) {
                         rc.Add(kvp);
                         processedPairs.Add(kvp.Key);
+                        foundSomethingToProcess = true;
                         yield return kvp;
                     }
                 }
+                if (!foundSomethingToProcess)
+                    throw new InvalidOperationException("Loop detected inside path");
             }
         }
 
@@ -114,12 +118,6 @@ namespace CriticalPathMethod
         /// <returns></returns>
         public static IEnumerable<T> CriticalPath<T>(this IEnumerable<T> list, Func<T, IEnumerable<T>> predecessorSelector, Func<T, long> lengthSelector) {
             var successors = list.GetSucessors(predecessorSelector);
-            if (list.All(l => predecessorSelector(l).Count() > 0) ||
-                successors.All(s => s.Value.Count() > 0)) {
-                System.Diagnostics.Debug.WriteLine("Predecessors: " + list.All(l => predecessorSelector(l).Count() > 0 ));
-                System.Diagnostics.Debug.WriteLine("Successors: " + successors.All(s => s.Value.Count() > 0));
-                throw new InvalidOperationException("There must be both a start and an end to the path with no loops");
-            }
             var piList = list.ToPathInfoDictionary(predecessorSelector, n => successors[n]);
             var orderedList = OrderByDependencies(piList).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);            
             orderedList.FillEarliestValues(lengthSelector);
