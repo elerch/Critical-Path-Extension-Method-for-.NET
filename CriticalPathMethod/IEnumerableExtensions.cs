@@ -110,13 +110,12 @@ namespace CriticalPathMethod
         /// </summary>
         /// <param name="list"></param>
         /// <param name="predecessorSelector"></param>
-        /// <param name="sucessorSelector"></param>
         /// <param name="lengthSelector"></param>
         /// <returns></returns>
         public static IEnumerable<T> CriticalPath<T>(this IEnumerable<T> list, Func<T, IEnumerable<T>> predecessorSelector, Func<T, long> lengthSelector) {
             var successors = list.GetSucessors(predecessorSelector);
-            var piList = list.ToPathInfoDicationary(predecessorSelector, n => successors[n]);
-            var orderedList = OrderByDependencies(piList).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            var piList = list.ToPathInfoDictionary(predecessorSelector, n => successors[n]);
+            var orderedList = OrderByDependencies(piList).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);            
             orderedList.FillEarliestValues(lengthSelector);
             orderedList.FillLatestValues(lengthSelector);
             return orderedList
@@ -125,6 +124,7 @@ namespace CriticalPathMethod
                         && (kvp.Value.EarliestStart - kvp.Value.LatestStart == 0))
                 .Select(n => n.Key);
         }
+
 
         private static IDictionary<T, IEnumerable<T>> GetSucessors<T>(this IEnumerable<T> list, Func<T, IEnumerable<T>> predecessorSelector) {
             var rc = new Dictionary<T, IEnumerable<T>>();
@@ -146,7 +146,7 @@ namespace CriticalPathMethod
             return rc;
         }
 
-        private static IDictionary<T, PathInfo<T>> ToPathInfoDicationary<T>(this IEnumerable<T> list, Func<T, IEnumerable<T>> predecessorSelector, Func<T, IEnumerable<T>> sucessorSelector) {
+        private static IDictionary<T, PathInfo<T>> ToPathInfoDictionary<T>(this IEnumerable<T> list, Func<T, IEnumerable<T>> predecessorSelector, Func<T, IEnumerable<T>> sucessorSelector) {
             return list.ToDictionary(
                 item => item, 
                 item => new PathInfo<T>(predecessorSelector(item), sucessorSelector(item)));

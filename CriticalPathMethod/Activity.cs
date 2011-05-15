@@ -22,7 +22,6 @@ namespace CriticalPathMethod
         public Activity()
         {
             Predecessors = new List<Activity>();
-            Successors = new List<Activity>();
         }
         /// <summary>
         /// Identification concerning the activity.
@@ -43,11 +42,6 @@ namespace CriticalPathMethod
         /// Activities that come before the activity.
         /// </summary>
         public ICollection<Activity> Predecessors { get; private set; }
-
-        /// <summary>
-        /// Activities that come after the activity.
-        /// </summary>
-        public ICollection<Activity> Successors { get; private set; }
 
         public override string ToString()
         {

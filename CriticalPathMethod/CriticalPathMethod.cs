@@ -9,9 +9,9 @@
 //
 
 using System;
-using System.Collections;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using CriticalPathMethod;
 using System.Collections.Generic;
 
@@ -23,8 +23,30 @@ namespace ComputerEngineering
         private static void Main(string[] args)
         {
             // Array to store the activities that'll be evaluated.
-            Output(GetActivities().Shuffle().CriticalPath(p => p.Predecessors, l => (long)l.Duration));
+            var activities = GetActivities();
+            Output(activities.Shuffle().CriticalPath(p => p.Predecessors, l => (long)l.Duration));
 
+            // This should create an infinite loop
+            var isCaughtProperly = false;
+            activities.First().Predecessors.Add(activities.Last());
+            var thread = new System.Threading.Thread(
+                () =>
+                    {
+                        try {
+                            activities.CriticalPath(p => p.Predecessors, l => (long)l.Duration);
+                        }
+                        catch (System.InvalidOperationException ex) {
+                            isCaughtProperly = true;
+                        }                        
+                    }
+                );
+            thread.Start();
+            Thread.Sleep(10000); // Wait for 10 seconds - our thread should finish by then
+            if(thread.ThreadState ==ThreadState.Running)
+                thread.Abort();
+            System.Console.WriteLine(isCaughtProperly
+                                         ? "Critical path caught the loop"
+                                         : "Critical path did not find the loop properly");
         }
 
         private static void Output(IEnumerable<Activity> list)
@@ -91,7 +113,6 @@ namespace ComputerEngineering
                             var aux = ad[id];
 
                             activity.Predecessors.Add(aux);
-                            aux.Successors.Add(activity);
                         }
                     }
                 }
@@ -107,7 +128,6 @@ namespace ComputerEngineering
                             var aux = ad[id];
 
                             activity.Key.Predecessors.Add(aux);
-                            aux.Successors.Add(activity.Key);
                         }
                         processedActivities.Add(activity.Key);
                     }
