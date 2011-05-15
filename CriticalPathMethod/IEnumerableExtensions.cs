@@ -114,6 +114,9 @@ namespace CriticalPathMethod
         /// <returns></returns>
         public static IEnumerable<T> CriticalPath<T>(this IEnumerable<T> list, Func<T, IEnumerable<T>> predecessorSelector, Func<T, long> lengthSelector) {
             var successors = list.GetSucessors(predecessorSelector);
+            if (list.All(l => predecessorSelector(l).Count() > 0) ||
+                successors.All(s => s.Value.Count() > 0))
+                throw new InvalidOperationException("There must be both a start and an end to the path with no loops");
             var piList = list.ToPathInfoDictionary(predecessorSelector, n => successors[n]);
             var orderedList = OrderByDependencies(piList).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);            
             orderedList.FillEarliestValues(lengthSelector);
@@ -124,7 +127,6 @@ namespace CriticalPathMethod
                         && (kvp.Value.EarliestStart - kvp.Value.LatestStart == 0))
                 .Select(n => n.Key);
         }
-
 
         private static IDictionary<T, IEnumerable<T>> GetSucessors<T>(this IEnumerable<T> list, Func<T, IEnumerable<T>> predecessorSelector) {
             var rc = new Dictionary<T, IEnumerable<T>>();

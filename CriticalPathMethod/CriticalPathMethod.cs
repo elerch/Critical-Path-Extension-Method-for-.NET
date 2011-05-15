@@ -41,7 +41,11 @@ namespace ComputerEngineering
                     }
                 );
             thread.Start();
-            Thread.Sleep(10000); // Wait for 10 seconds - our thread should finish by then
+            for (var i = 0; i < 100; i++) {
+                Thread.Sleep(100); // Wait for 10 seconds - our thread should finish by then
+                if (thread.ThreadState != ThreadState.Running)
+                    break;
+            }
             if(thread.ThreadState ==ThreadState.Running)
                 thread.Abort();
             System.Console.WriteLine(isCaughtProperly
