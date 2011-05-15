@@ -27,8 +27,15 @@ namespace ComputerEngineering
             Output(activities.Shuffle().CriticalPath(p => p.Predecessors, l => (long)l.Duration));
 
             // This should create an infinite loop
-            var isCaughtProperly = false;
             activities.First().Predecessors.Add(activities.Last());
+            CheckForLoops(activities);
+            activities.First().Predecessors.Remove(activities.Last());
+            activities.Skip(1).First().Predecessors.Add(activities.Skip(activities.Count() - 2).First());
+            CheckForLoops(activities.Shuffle());
+        }
+
+        private static void CheckForLoops(IEnumerable<Activity> activities) {
+            var isCaughtProperly = false;
             var thread = new System.Threading.Thread(
                 () =>
                     {
